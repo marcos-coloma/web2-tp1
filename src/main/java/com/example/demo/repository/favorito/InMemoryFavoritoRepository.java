@@ -11,6 +11,7 @@ import java.util.Optional;
 public class InMemoryFavoritoRepository implements FavoritoRepository {
 
     private final List<Favorito> favoritos = new ArrayList<>();
+    private long nextId = 1;
 
     @Override
     public List<Favorito> findAll() {
@@ -26,7 +27,22 @@ public class InMemoryFavoritoRepository implements FavoritoRepository {
 
     @Override
     public Favorito save(Favorito favorito) {
+
+        if (favorito.id() == null) {
+            Favorito nuevoFavorito = new Favorito(
+                    nextId++,
+                    favorito.productoId(),
+                    favorito.nota(),
+                    favorito.fechaAgregado()
+            );
+
+            favoritos.add(nuevoFavorito);
+            return nuevoFavorito;
+        }
+
+        favoritos.removeIf(f -> f.id().equals(favorito.id()));
         favoritos.add(favorito);
+
         return favorito;
     }
 
