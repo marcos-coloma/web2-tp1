@@ -18,4 +18,11 @@ public class DummyJsonClient {
                 .retrieve()
                 .body(DummyJsonProductosResponse.class);
     }
+
+    public DummyJsonProducto obtenerProductoPorId(Long id) {
+        return restClient.get()
+                .uri("/products/{id}", id)
+                .retrieve()
+                .body(DummyJsonProducto.class);
+    }
 }

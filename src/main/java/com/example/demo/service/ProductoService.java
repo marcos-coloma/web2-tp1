@@ -24,6 +24,12 @@ public class ProductoService {
                 .toList();
     }
 
+    public ProductoDTO obtenerProductoPorId(Long id) {
+        DummyJsonProducto producto = dummyJsonClient.obtenerProductoPorId(id);
+
+        return mapearProducto(producto);
+    }
+
     private ProductoDTO mapearProducto(DummyJsonProducto producto) {
         return new ProductoDTO(
                 producto.id(),
