@@ -25,4 +25,15 @@ public class DummyJsonClient {
                 .retrieve()
                 .body(DummyJsonProducto.class);
     }
+
+    public DummyJsonProductosResponse obtenerProductos(int limit, int skip) {
+        return restClient.get()
+            .uri(uriBuilder -> uriBuilder
+                .path("/products")
+                .queryParam("limit", limit)
+                .queryParam("skip", skip)
+                .build())
+            .retrieve()
+            .body(DummyJsonProductosResponse.class);
+    }
 }
