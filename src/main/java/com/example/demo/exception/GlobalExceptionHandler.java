@@ -24,36 +24,49 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(RecursoNoEncontradoException.class)
-    public ProblemDetail handleNoEncontrado(RecursoNoEncontradoException ex) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ProblemDetail handleNotFound(ResourceNotFoundException ex) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage()
+        );
     }
 
-    @ExceptionHandler(ServicioExternoException.class)
-    public ProblemDetail handleServicioExterno(ServicioExternoException ex) {
-        ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY, ex.getMessage());
-        problema.setTitle("Falla al consumir un servicio externo");
-        return problema;
+    @ExceptionHandler(ExternalServiceException.class)
+    public ProblemDetail handleExternalService(ExternalServiceException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_GATEWAY,
+                ex.getMessage()
+        );
+        problem.setTitle("Falla al consumir un servicio externo");
+        return problem;
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ProblemDetail handleValidacion(MethodArgumentNotValidException ex) {
-        Map<String, String> errores = new LinkedHashMap<>();
+    public ProblemDetail handleValidation(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new LinkedHashMap<>();
+
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-            errores.put(error.getField(), error.getDefaultMessage());
+            errors.put(error.getField(), error.getDefaultMessage());
         }
-        ProblemDetail problema = ProblemDetail.forStatusAndDetail(
-                HttpStatus.BAD_REQUEST, "Uno o más campos no son válidos");
-        problema.setTitle("Error de validación");
-        problema.setProperty("errores", errores);
-        return problema;
+
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                "Uno o más campos no son válidos"
+        );
+        problem.setTitle("Error de validación");
+        problem.setProperty("errores", errors);
+
+        return problem;
     }
 
     @ExceptionHandler(Exception.class)
-    public ProblemDetail handleGenerico(Exception ex) {
-        ProblemDetail problema = ProblemDetail.forStatusAndDetail(
-                HttpStatus.INTERNAL_SERVER_ERROR, "Ocurrió un error inesperado");
-        problema.setTitle("Error interno");
-        return problema;
+    public ProblemDetail handleGeneric(Exception ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Ocurrió un error inesperado"
+        );
+        problem.setTitle("Error interno");
+        return problem;
     }
 }

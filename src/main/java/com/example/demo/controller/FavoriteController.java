@@ -3,6 +3,9 @@ package com.example.demo.controller;
 import com.example.demo.dto.favorite.FavoriteInputDTO;
 import com.example.demo.dto.favorite.FavoriteOutputDTO;
 import com.example.demo.service.FavoriteService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,17 +22,6 @@ public class FavoriteController {
         this.favoriteService = favoriteService;
     }
 
-    @PostMapping
-    public ResponseEntity<FavoriteOutputDTO> create(
-            @RequestBody FavoriteInputDTO dto) {
-
-        FavoriteOutputDTO favorite = favoriteService.create(dto);
-
-        return ResponseEntity
-                .created(URI.create("/api/favorites/" + favorite.id()))
-                .body(favorite);
-    }
-
     @GetMapping
     public ResponseEntity<List<FavoriteOutputDTO>> getAll() {
         return ResponseEntity.ok(favoriteService.getAll());
@@ -42,10 +34,22 @@ public class FavoriteController {
         return ResponseEntity.ok(favoriteService.getById(id));
     }
 
+
+    @PostMapping
+    public ResponseEntity<FavoriteOutputDTO> create(
+            @Valid @RequestBody FavoriteInputDTO dto) {
+
+        FavoriteOutputDTO favorite = favoriteService.create(dto);
+
+        return ResponseEntity
+                .created(URI.create("/api/favorites/" + favorite.id()))
+                .body(favorite);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<FavoriteOutputDTO> update(
             @PathVariable Long id,
-            @RequestBody FavoriteInputDTO dto) {
+            @Valid @RequestBody FavoriteInputDTO dto) {
 
         return ResponseEntity.ok(favoriteService.update(id, dto));
     }
