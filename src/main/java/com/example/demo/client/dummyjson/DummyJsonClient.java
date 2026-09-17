@@ -12,28 +12,28 @@ public class DummyJsonClient {
         this.restClient = dummyJsonRestClient;
     }
 
-    public DummyJsonProductosResponse obtenerProductos() {
+    public DummyJsonProductsResponse getProducts() {
         return restClient.get()
                 .uri("/products")
                 .retrieve()
-                .body(DummyJsonProductosResponse.class);
+                .body(DummyJsonProductsResponse.class);
     }
 
-    public DummyJsonProducto obtenerProductoPorId(Long id) {
+    public DummyJsonProduct getProductById(Long id) {
         return restClient.get()
                 .uri("/products/{id}", id)
                 .retrieve()
-                .body(DummyJsonProducto.class);
+                .body(DummyJsonProduct.class);
     }
 
-    public DummyJsonProductosResponse obtenerProductos(int limit, int skip) {
+    public DummyJsonProductsResponse getProducts(int limit, int skip) {
         return restClient.get()
-            .uri(uriBuilder -> uriBuilder
-                .path("/products")
-                .queryParam("limit", limit)
-                .queryParam("skip", skip)
-                .build())
-            .retrieve()
-            .body(DummyJsonProductosResponse.class);
+                .uri(uriBuilder -> uriBuilder
+                        .path("/products")
+                        .queryParam("limit", limit)
+                        .queryParam("skip", skip)
+                        .build())
+                .retrieve()
+                .body(DummyJsonProductsResponse.class);
     }
 }
