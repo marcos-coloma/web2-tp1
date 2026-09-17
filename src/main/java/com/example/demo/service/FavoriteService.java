@@ -5,6 +5,7 @@ import com.example.demo.dto.favorite.FavoriteInputDTO;
 import com.example.demo.dto.favorite.FavoriteOutputDTO;
 import com.example.demo.repository.favorite.FavoriteRepository;
 import org.springframework.stereotype.Service;
+import com.example.demo.exception.ResourceNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,26 +32,28 @@ public class FavoriteService {
                 .toList();
     }
 
-    public FavoriteOutputDTO getById(Long id) {
-        Favorite favorite = favoriteRepository.findById(id)
-                .orElseThrow();
+public FavoriteOutputDTO getById(Long id) {
+    Favorite favorite = favoriteRepository.findById(id)
+            .orElseThrow(() ->
+                    new ResourceNotFoundException("Favorite not found with id: " + id));
 
-        return convertToOutput(favorite);
-    }
+    return convertToOutput(favorite);
+}
 
-    public FavoriteOutputDTO update(Long id, FavoriteInputDTO dto) {
-        Favorite currentFavorite = favoriteRepository.findById(id)
-                .orElseThrow();
+public FavoriteOutputDTO update(Long id, FavoriteInputDTO dto) {
+    Favorite currentFavorite = favoriteRepository.findById(id)
+            .orElseThrow(() ->
+                    new ResourceNotFoundException("Favorite not found with id: " + id));
 
-        Favorite updatedFavorite = new Favorite(
-                currentFavorite.id(),
-                dto.productId(),
-                dto.note(),
-                currentFavorite.dateAdded()
-        );
+    Favorite updatedFavorite = new Favorite(
+            currentFavorite.id(),
+            dto.productId(),
+            dto.note(),
+            currentFavorite.dateAdded()
+    );
 
-        return convertToOutput(favoriteRepository.save(updatedFavorite));
-    }
+    return convertToOutput(favoriteRepository.save(updatedFavorite));
+}
 
     public void delete(Long id) {
         favoriteRepository.deleteById(id);

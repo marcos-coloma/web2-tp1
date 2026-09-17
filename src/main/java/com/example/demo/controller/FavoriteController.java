@@ -4,6 +4,7 @@ import com.example.demo.dto.favorite.FavoriteInputDTO;
 import com.example.demo.dto.favorite.FavoriteOutputDTO;
 import com.example.demo.service.FavoriteService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -22,11 +23,13 @@ public class FavoriteController {
         this.favoriteService = favoriteService;
     }
 
+    @Operation(summary = "Get all favorites")
     @GetMapping
     public ResponseEntity<List<FavoriteOutputDTO>> getAll() {
         return ResponseEntity.ok(favoriteService.getAll());
     }
 
+    @Operation(summary = "Get a favorite by ID")
     @GetMapping("/{id}")
     public ResponseEntity<FavoriteOutputDTO> getById(
             @PathVariable Long id) {
@@ -34,7 +37,7 @@ public class FavoriteController {
         return ResponseEntity.ok(favoriteService.getById(id));
     }
 
-
+    @Operation(summary = "Create a favorite")
     @PostMapping
     public ResponseEntity<FavoriteOutputDTO> create(
             @Valid @RequestBody FavoriteInputDTO dto) {
@@ -46,6 +49,7 @@ public class FavoriteController {
                 .body(favorite);
     }
 
+    @Operation(summary = "Update a favorite")
     @PutMapping("/{id}")
     public ResponseEntity<FavoriteOutputDTO> update(
             @PathVariable Long id,
@@ -54,6 +58,7 @@ public class FavoriteController {
         return ResponseEntity.ok(favoriteService.update(id, dto));
     }
 
+    @Operation(summary = "Delete a favorite")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable Long id) {
