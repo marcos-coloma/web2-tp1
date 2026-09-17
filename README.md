@@ -1,15 +1,14 @@
 # TP1 · Spring Boot, API REST y arquitectura en capas
 
-Punto de partida del práctico. Está armada la **configuración e
-infraestructura transversal** que van a necesitar sin importar cómo
-resuelvan cada consigna; lo que falta —el diseño y la lógica propia de cada
-recurso— se va a ir sumando a esta rama a medida que avance la cursada.
+API REST desarrollada con Spring Boot, aplicando una arquitectura en capas y separando controllers, services, repositories, DTOs y clientes externos.
+
+El proyecto consume productos desde DummyJSON y administra favoritos mediante un repository en memoria.
 
 ## Cómo levantar el proyecto
 
 Requiere Java 25. Usar siempre el wrapper, nunca un `mvn` instalado aparte:
 
-```
+```bash
 # Windows
 .\mvnw.cmd spring-boot:run
 
@@ -17,51 +16,65 @@ Requiere Java 25. Usar siempre el wrapper, nunca un `mvn` instalado aparte:
 ./mvnw spring-boot:run
 ```
 
-Cuando el log muestre `Started DemoApplication`, la app queda escuchando en
-`http://localhost:8080`.
+Cuando el log muestre `Started DemoApplication`, la aplicación queda escuchando en:
 
-Para compilar y correr los tests: `./mvnw test` (o `.\mvnw.cmd test`).
+`http://localhost:8080`
 
-## Endpoints disponibles hoy
+Para compilar y ejecutar los tests:
 
-| Método | Path | Qué hace |
-|---|---|---|
-| GET | `/health` | Chequeo de salud básico |
-| GET | `/ping` | Devuelve `pong`, sin JSON — otro chequeo trivial |
-
-```
-curl http://localhost:8080/health
-curl http://localhost:8080/ping
+```bash
+./mvnw test
 ```
 
-## Qué ya está armado
+En Windows:
 
-- **`config/RestClientConfig`**: bean de `RestClient` apuntado a la
-  `base-url` de DummyJSON (`app.dummyjson.base-url` en
-  `application.properties`). Listo para inyectar.
-- **`config/OpenApiConfig`**: metadata general de Swagger UI.
-- **`client/dummyjson/DummyJsonProducto` y `DummyJsonProductosResponse`**:
-  la forma exacta del JSON que devuelve `https://dummyjson.com/products` —
-  para no tener que adivinar los nombres de campo del proveedor externo.
-- **`exception/GlobalExceptionHandler`** (+ `RecursoNoEncontradoException` y
-  `ServicioExternoException`): manejo uniforme de errores para toda la API
-  (`ProblemDetail`). Ya contempla 404 y errores de un servicio externo —
-  se reusa tal cual para cualquier recurso nuevo que se agregue.
+```bash
+.\mvnw.cmd test
+```
 
-## Qué falta (eso es la consigna)
+## Endpoints disponibles
 
-- Un cliente propio (`DummyJsonClient` o como se llame) que use el
-  `RestClient` ya configurado para llamar a `/products` y `/products/{id}`,
-  manejando los errores de red/HTTP con las excepciones ya definidas.
-- Un DTO propio para el producto (no el JSON externo tal cual) y el
-  service/controller de `/api/productos`.
-- Todo el recurso de favoritos: entidad, repository en memoria, DTOs,
-  service y controller CRUD.
-- Anotar los controllers con `@Tag`/`@Operation` para que Swagger UI los
-  documente.
+### Products
 
-## Dependencias
+Los productos son obtenidos desde DummyJSON y transformados al DTO propio de la aplicación.
 
-- `spring-boot-starter-webmvc` — Spring MVC + Tomcat embebido.
-- `spring-boot-starter-validation` — Bean Validation (`@NotNull`, `@NotBlank`, ...).
-- `springdoc-openapi-starter-webmvc-ui` — Swagger UI / OpenAPI.
+| Método | Path                 | Qué hace                    |
+| ------ | -------------------- | --------------------------- |
+| GET    | `/api/products`      | Obtiene productos paginados |
+| GET    | `/api/products/{id}` | Obtiene un producto por ID  |
+
+La paginación utiliza los parámetros:
+
+```text
+/api/products?limit=10&skip=0
+```
+
+* `limit`: cantidad de productos a devolver. Mínimo `1`.
+* `skip`: cantidad de productos a omitir. Mínimo `0`.
+
+### Favorites
+
+Los favoritos se almacenan en memoria mientras la aplicación está ejecutándose.
+
+| Método | Path                  | Qué hace                    |
+| ------ | --------------------- | --------------------------- |
+| GET    | `/api/favorites`      | Obtiene todos los favoritos |
+| GET    | `/api/favorites/{id}` | Obtiene un favorito por ID  |
+| POST   | `/api/favorites`      | Crea un favorito            |
+| PUT    | `/api/favorites/{id}` | Actualiza un favorito       |
+| DELETE | `/api/favorites/{id}` | Elimina un favorito         |
+
+## Swagger / OpenAPI
+
+La documentación de la API está disponible mediante Swagger UI:
+
+`http://localhost:8080/swagger-ui/index.html`
+
+Desde allí se pueden consultar y ejecutar los endpoints de `Products` y `Favorites`.
+
+
+## Dependencias principales
+
+* **`spring-boot-starter-webmvc`** — Spring MVC y Tomcat embebido.
+* **`spring-boot-starter-validation`** — Bean Validation (`@NotNull`, `@NotBlank`, `@Min`, etc.).
+* **`springdoc-openapi-starter-webmvc-ui`** — Swagger UI / OpenAPI.
