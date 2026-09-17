@@ -1,6 +1,9 @@
 package com.example.demo.client.dummyjson;
 
+import com.example.demo.exception.ResourceNotFoundException;
+
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 @Component
@@ -20,10 +23,15 @@ public class DummyJsonClient {
     }
 
     public DummyJsonProduct getProductById(Long id) {
-        return restClient.get()
-                .uri("/products/{id}", id)
-                .retrieve()
-                .body(DummyJsonProduct.class);
+        try {
+            return restClient.get()
+                    .uri("/products/{id}", id)
+                    .retrieve()
+                    .body(DummyJsonProduct.class);
+        } catch (HttpClientErrorException.NotFound ex) {
+            throw new ResourceNotFoundException(
+                    "Product not found with id: " + id);
+        }
     }
 
     public DummyJsonProductsResponse getProducts(int limit, int skip) {

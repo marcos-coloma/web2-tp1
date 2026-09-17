@@ -1,3 +1,8 @@
+
+
+
+
+
 package com.example.demo.exception;
 
 import org.springframework.http.HttpStatus;
@@ -6,9 +11,11 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 
 /**
  * Manejador centralizado de errores de toda la API. En vez de que cada
@@ -21,6 +28,9 @@ import java.util.Map;
  * RecursoNoEncontradoException o que el DTO de entrada tenga anotaciones
  * de Bean Validation para que estos mismos handlers respondan.
  */
+
+
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -56,6 +66,19 @@ public class GlobalExceptionHandler {
         );
         problem.setTitle("Error de validación");
         problem.setProperty("errores", errors);
+
+        return problem;
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ProblemDetail handleParameterValidation(
+            HandlerMethodValidationException ex) {
+
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                "Uno o más parámetros no son válidos"
+        );
+        problem.setTitle("Error de validación");
 
         return problem;
     }
